@@ -9,13 +9,13 @@ using Xu;
 
 namespace TestFSQ
 {
-    public abstract class VisaClient : IDisposable, IEquatable<VisaClient>
+    public abstract class ViClient : IDisposable, IEquatable<ViClient>
     {
-        public VisaClient(string resourceName) => Open(resourceName);
+        public ViClient(string resourceName) => Open(resourceName);
 
-        public void Dispose() => Session?.Dispose();
+        public virtual void Dispose() => Session?.Dispose();
 
-        private MessageBasedSession Session { get; set; }
+        protected MessageBasedSession Session { get; set; }
 
         public string ResourceName { get; private set; }
 
@@ -46,12 +46,12 @@ namespace TestFSQ
             catch (InvalidCastException iexp)
             {
                 Session = null;
-                MessageBox.Show("Type must be \"MessageBasedSession\": " + iexp.Message);
+                Console.WriteLine("Type must be \"MessageBasedSession\": " + iexp.Message);
             }
             catch (Exception exp)
             {
                 Session = null;
-                MessageBox.Show(exp.Message);
+                Console.WriteLine(exp.Message);
             }
             finally
             {
@@ -63,6 +63,17 @@ namespace TestFSQ
 
         public void Write(string cmd)
         {
+            WriteNoErrorCheck(cmd);
+
+            if (GetError() is ViException error && error.Code != 0)
+            {
+                Console.WriteLine(error.Code + " || " + error.Message);
+                throw error;
+            }
+        }
+
+        private void WriteNoErrorCheck(string cmd)
+        {
             try
             {
                 lock (Session)
@@ -70,11 +81,24 @@ namespace TestFSQ
             }
             catch (Exception exp)
             {
-                MessageBox.Show(exp.Message);
+                Console.WriteLine(exp.Message);
             }
         }
 
         public string Read()
+        {
+            string res = ReadNoErrorCheck();
+
+            if (GetError() is ViException error && error.Code != 0)
+            {
+                Console.WriteLine(error.Code + " || " + error.Message);
+                throw error;
+            }
+            else
+                return res;
+        }
+
+        private string ReadNoErrorCheck()
         {
             try
             {
@@ -89,7 +113,7 @@ namespace TestFSQ
             }
             catch (Exception exp)
             {
-                MessageBox.Show(exp.Message);
+                Console.WriteLine(exp.Message);
                 return null;
             }
             finally
@@ -99,6 +123,19 @@ namespace TestFSQ
         }
 
         public string Query(string cmd)
+        {
+            string res = QueryNoErrorCheck(cmd);
+
+            if (GetError() is ViException error && error.Code != 0)
+            {
+                Console.WriteLine(error.Code + " || " + error.Message);
+                throw error;
+            }
+            else
+                return res;
+        }
+
+        private string QueryNoErrorCheck(string cmd)
         {
             try
             {
@@ -113,7 +150,7 @@ namespace TestFSQ
             }
             catch (Exception exp)
             {
-                MessageBox.Show(exp.Message);
+                Console.WriteLine(exp.Message);
                 return null;
             }
             finally
@@ -202,6 +239,8 @@ namespace TestFSQ
 
         public double GetNumber(string cmd) => double.Parse(Query(cmd).Trim());
 
+        private ViException GetError() => new ViException(QueryNoErrorCheck("SYST:ERR?\n").Trim());
+
         public void SyncWait() => Write("INIT;*WAI\n");
 
         public bool IsReady => Query("*OPC?\n").Trim() == "1";
@@ -215,12 +254,28 @@ namespace TestFSQ
         private IAsyncResult AsyncHandle { get; set; } = null;
 
         public override string ToString() => ResourceName + " | " + VendorName + " | " + Model + " | " + SerialNumber + " | " + DeviceVersion;
-
-        public bool Equals(VisaClient other) => ResourceName == other.ResourceName;
-        public static bool operator !=(VisaClient s1, VisaClient s2) => !s1.Equals(s2);
-        public static bool operator ==(VisaClient s1, VisaClient s2) => s1.Equals(s2);
-        public override bool Equals(object other) => other is VisaClient sp && Equals(sp);
-
         public override int GetHashCode() => ResourceName.GetHashCode();
+        public bool Equals(ViClient other) => ResourceName == other.ResourceName;
+        public static bool operator !=(ViClient s1, ViClient s2) => !s1.Equals(s2);
+        public static bool operator ==(ViClient s1, ViClient s2) => s1.Equals(s2);
+        public override bool Equals(object other) => other is ViClient sp && Equals(sp);
+    }
+
+    public class ViException : Exception
+    {
+        public ViException(string returnMessage)
+        {
+            var fields = returnMessage.CsvReadFields();
+
+            if (fields.Length > 1)
+            {
+                Code = fields[0].ToInt32(-1);
+                Message = fields[1].Trim().Trim('"').Trim();
+            }
+        }
+
+        public virtual int Code { get; } = 0;
+
+        public override string Message { get; } = string.Empty;
     }
 }

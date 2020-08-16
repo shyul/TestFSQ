@@ -20,7 +20,7 @@ namespace TestFSQ
         B,
     }
 
-    public class SpecAn : VisaClient
+    public class SpecAn : ViClient
     {
         /*
         public SpecAn()

@@ -6,12 +6,19 @@ using System.Threading.Tasks;
 
 namespace TestFSQ
 {
-    public class SigGen : VisaClient
+    public class SigGen : ViClient
     {
         public SigGen(string resourceName) : base(resourceName)
         {
             RFOutputEnable = false;
             ModulationEnable = false;
+        }
+
+        public override void Dispose()
+        {
+            RFOutputEnable = false;
+            ModulationEnable = false;
+            Session?.Dispose();
         }
 
         public double Frequency

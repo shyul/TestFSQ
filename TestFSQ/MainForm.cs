@@ -22,7 +22,7 @@ namespace TestFSQ
 
         private void BtnTestFindResources_Click(object sender, EventArgs e)
         {
-            var list = VisaClient.FindResources();
+            var list = ViClient.FindResources();
             foreach(string s in list) 
             {
                 Console.WriteLine(s);
@@ -32,11 +32,13 @@ namespace TestFSQ
 
 
         const string SpecAnAddress = "TCPIP0::192.168.18.31::inst0::INSTR";
-        const string SigGenAddress = "GPIB0::25::INSTR";
+        const string SigGen1Address = "GPIB0::25::INSTR";
+        const string SigGen2Address = "TCPIP0::192.168.18.34::inst0::INSTR";
+        const string PowerSensorAddress = "GPIB0::25::INSTR";
 
         private SpecAn SpecAn { get; set; }
 
-        private SigGen SigGen { get; set; }
+        private SigGen SigGen1 { get; set; }
 
         private Task SpecAnRefreshTask { get; set; }
 
@@ -52,24 +54,24 @@ namespace TestFSQ
                 SpecAn.SelectScreen(FSQScreen.A);
             }
 
-            if (SigGen is null)
+            if (SigGen1 is null)
             {
-                SigGen = new SigGen(SigGenAddress);
-                Console.WriteLine(SigGen.ToString());
+                SigGen1 = new SigGen(SigGen1Address);
+                Console.WriteLine(SigGen1.ToString());
             }
         }
 
         private void SetTestLink(double freq, double power) 
         {
-            SpecAn.CenterFrequency = SigGen.Frequency = freq;
+            SpecAn.CenterFrequency = SigGen1.Frequency = freq;
             SpecAn.InputAttenuation = 20;
             SpecAn.ReferenceLevel = 10;
             SpecAn.RBW = 1e5;
-            SigGen.Power = power;
+            SigGen1.Power = power;
 
-            double delta = SigGen.Frequency - SpecAn.CenterFrequency;
-            double actual_power = power - SigGen.Power;
-            SigGen.RFOutputEnable = true;
+            double delta = SigGen1.Frequency - SpecAn.CenterFrequency;
+            double actual_power = power - SigGen1.Power;
+            SigGen1.RFOutputEnable = true;
             SpecAn.SpanFrequency = 40e6;
 
             Console.WriteLine("freq error = " + delta);
@@ -106,6 +108,18 @@ namespace TestFSQ
             SpecAn.GetTraceData(Program.SpectrumTable, 1);
 
             //result.ForEach(n => Console.WriteLine(n.freq + " | " + n.value));
+        }
+
+        private void BtnTestESGError_Click(object sender, EventArgs e)
+        {
+            if (SigGen1 is null)
+            {
+                SigGen1 = new SigGen(SigGen1Address);
+                Console.WriteLine(SigGen1.ToString());
+            }
+
+            //ViException error = SigGen1.GetError();
+            //Console.WriteLine(error.Code + " || " + error.Message);
         }
     }
 }

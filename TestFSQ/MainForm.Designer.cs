@@ -31,6 +31,7 @@
             this.BtnTestFindResources = new System.Windows.Forms.Button();
             this.BtnTestFSQ = new System.Windows.Forms.Button();
             this.BtnAutoFindFSQ = new System.Windows.Forms.Button();
+            this.BtnTestESGError = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // BtnTestFindResources
@@ -63,11 +64,22 @@
             this.BtnAutoFindFSQ.UseVisualStyleBackColor = true;
             this.BtnAutoFindFSQ.Click += new System.EventHandler(this.BtnAutoFindFSQ_Click);
             // 
+            // BtnTestESGError
+            // 
+            this.BtnTestESGError.Location = new System.Drawing.Point(190, 48);
+            this.BtnTestESGError.Name = "BtnTestESGError";
+            this.BtnTestESGError.Size = new System.Drawing.Size(116, 23);
+            this.BtnTestESGError.TabIndex = 3;
+            this.BtnTestESGError.Text = "Test ESG Error";
+            this.BtnTestESGError.UseVisualStyleBackColor = true;
+            this.BtnTestESGError.Click += new System.EventHandler(this.BtnTestESGError_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.BtnTestESGError);
             this.Controls.Add(this.BtnAutoFindFSQ);
             this.Controls.Add(this.BtnTestFSQ);
             this.Controls.Add(this.BtnTestFindResources);
@@ -82,6 +94,7 @@
         private System.Windows.Forms.Button BtnTestFindResources;
         private System.Windows.Forms.Button BtnTestFSQ;
         private System.Windows.Forms.Button BtnAutoFindFSQ;
+        private System.Windows.Forms.Button BtnTestESGError;
     }
 }
 
