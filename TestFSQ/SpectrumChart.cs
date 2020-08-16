@@ -24,11 +24,11 @@ namespace TestFSQ
                 UpperLimit = -20,
                 LowerLimit = -80,
                 UpperColor = Color.Green,
-                LowerColor = Color.Red,
+                LowerColor = Color.DarkOrange,
                 FixedTickStep_Right = 10,
 
             });
-            MainArea.AddSeries(MainSeries = new LineSeries(SpectrumDatum.Column_Amplitude));
+            MainArea.AddSeries(MainSeries = new LineSeries(SpectrumDatum.Column_Amplitude) { Color = Color.Gray });
         }
 
         public override int RightBlankAreaWidth => 0;

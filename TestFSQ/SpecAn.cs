@@ -68,34 +68,115 @@ namespace TestFSQ
             }
         }
 
-        public double SetCenterFreq(double freq) => double.Parse(SetCenterFreq(freq.ToString("0.#########") + "Hz"));
-
-        public string SetCenterFreq(string freq)
+        /// <summary>
+        /// [:SENSe]:POWer[:RF]:ATTenuation:AUTO OFF|ON|0|1
+        /// [:SENSe]:POWer[:RF]:ATTenuation:AUTO?
+        /// </summary>
+        public bool IsAutoAttenuation
         {
-            Write("FREQ:CENT " + freq + "\n");
-            return Query("FREQ:CENT?\n").Trim();
+            get => Query("POW:RF:ATT:AUTO?\n").Trim() == "1";
+            set
+            {
+                if (value)
+                    Write("POW:RF:ATT:AUTO ON");
+                else
+                    Write("POW:RF:ATT:AUTO OFF");
+            }
         }
 
-        public double SetSpanFreq(double freq) 
-        { 
-            SetSpanFreq(freq.ToString("0.#########") + "Hz");
-            return GetSpanFreq();
+        /// <summary>
+        /// [:SENSe]:POWer[:RF]:ATTenuation <rel_ampl>
+        /// [:SENSe]:POWer[:RF]:ATTenuation?
+        /// </summary>
+        public double InputAttenuation
+        {
+            get => GetNumber("POW:RF:ATT?");
+            set => Write("POW:RF:ATT " + value.ToInt32() + "\n");
+        }
+
+        /// <summary>
+        /// :DISPlay:WINDow[1]:TRACe:Y[:SCALe]:RLEVel <real>
+        /// :DISPlay:WINDow[1]:TRACe:Y[:SCALe]:RLEVel?
+        /// DISP:WIND1:TRAC:Y:RLEV?
+        /// </summary>
+        public double ReferenceLevel
+        {
+            get => GetNumber("DISP:WIND1:TRAC:Y:RLEV?");
+            set => Write("DISP:WIND1:TRAC:Y:RLEV " + value.ToString("0.###") + "\n");
+        }
+
+        public double CenterFrequency 
+        {
+            get => GetNumber("FREQ:CENT?\n");
+            set => Write("FREQ:CENT " + value.ToString("0.#########") + "Hz\n");
+        }
+
+        public double OffsetFrequency
+        {
+            get => GetNumber("FREQ:OFFS?\n");
+            set => Write("FREQ:OFFS " + value.ToString("0.#########") + "Hz\n");
+        }
+
+        public double StartFrequency
+        {
+            get => GetNumber("FREQ:STAR?\n");
+            set => Write("FREQ:STAR " + value.ToString("0.#########") + "Hz\n");
+        }
+
+        public double StopFrequency
+        {
+            get => GetNumber("FREQ:STOP?\n");
+            set => Write("FREQ:STOP " + value.ToString("0.#########") + "Hz\n");
+        }
+
+        public double SpanFrequency
+        {
+            get => GetNumber("FREQ:SPAN?\n");
+            set => Write("FREQ:SPAN " + value.ToString("0.#########") + "Hz\n");
         }
 
         public void SetFullSpan() => Write("FREQ:SPAN:FULL");
         public void SetZeroSpan() => Write("FREQ:SPAN 0Hz");
-        public void SetSpanFreq(string freq) => Write("FREQ:SPAN " + freq + "\n");
-        public double GetSpanFreq() => GetNumber("FREQ:SPAN?\n");
 
-        public void SetStartFreq(string freq) => Write("FREQ:STAR " + freq + "\n");
-        public double GetStartFreq() => GetNumber("FREQ:STAR?\n");
+        public bool IsAutoRBW 
+        {
+            get => Query("BAND:AUTO?\n").Trim() == "1";
+            set
+            {
+                if (value)
+                    Write("BAND:AUTO ON");
+                else
+                    Write("BAND:AUTO OFF");
+            }
+        }
 
-        public void SetStopFreq(string freq) => Write("FREQ:STOP " + freq + "\n");
-        public double GetStopFreq() => GetNumber("FREQ:STOP?\n");
+        /// <summary>
+        /// BAND?
+        /// BAND 10KHz
+        /// </summary>
+        public double RBW
+        {
+            get => GetNumber("BAND?\n");
+            set => Write("BAND " + value.ToString("0.#########") + "Hz\n");
+        }
 
-        public void SetOffsetFreq(string freq) => Write("FREQ:OFFS " + freq + "\n");
-        public double GetOffsetFreq() => GetNumber("FREQ:OFFS?\n");
+        public bool IsAutoVBW
+        {
+            get => Query("BAND:VID:AUTO?\n").Trim() == "1";
+            set
+            {
+                if (value)
+                    Write("BAND:VID:AUTO ON");
+                else
+                    Write("BAND:VID:AUTO OFF");
+            }
+        }
 
+        public double VBW
+        {
+            get => GetNumber("BAND:VID?\n");
+            set => Write("BAND:VID " + value.ToString("0.#########") + "Hz\n");
+        }
 
         public void SelectTrace(int num) => Write("DISP:WIND:TRAC" + num.ToString() + "\n");
 
@@ -106,8 +187,8 @@ namespace TestFSQ
             //SyncWait();
             while (!IsReady) { }
 
-            double freq = GetStartFreq();
-            double stopFreq = GetStopFreq();
+            double freq = StartFrequency;
+            double stopFreq = StopFrequency;
             double delta = Math.Abs(stopFreq - freq);
 
             var list = GetTraceData(num).ToList();

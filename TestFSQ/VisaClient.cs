@@ -25,7 +25,7 @@ namespace TestFSQ
 
         public string SerialNumber { get; private set; } = "Unknown";
 
-        public string Version { get; private set; } = "Unknown";
+        public string DeviceVersion { get; private set; } = "Unknown";
 
         protected void Open(string resourceName)
         {
@@ -34,13 +34,13 @@ namespace TestFSQ
                 ResourceName = resourceName;
                 Session = ResourceManager.GetLocalManager().Open(ResourceName) as MessageBasedSession;
                 Reset();
-                string[] result = Query("*IDN?\n").Trim().Split(',');
+                string[] result = Query("*IDN?\n").Split(',');
                 if (result.Length > 3)
                 {
-                    VendorName = result[0];
-                    Model = result[1];
-                    SerialNumber = result[2];
-                    Version = result[3];
+                    VendorName = result[0].Trim();
+                    Model = result[1].Trim();
+                    SerialNumber = result[2].Trim();
+                    DeviceVersion = result[3].Trim();
                 }
             }
             catch (InvalidCastException iexp)
@@ -214,7 +214,7 @@ namespace TestFSQ
 
         private IAsyncResult AsyncHandle { get; set; } = null;
 
-        public override string ToString() => ResourceName + " | " + VendorName + " | " + Model + " | " + SerialNumber;
+        public override string ToString() => ResourceName + " | " + VendorName + " | " + Model + " | " + SerialNumber + " | " + DeviceVersion;
 
         public bool Equals(VisaClient other) => ResourceName == other.ResourceName;
 

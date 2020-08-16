@@ -17,6 +17,10 @@ namespace TestFSQ
             Amplitude = amp;
         }
 
+        public double Frequency { get; set; }
+
+        public double Amplitude { get; set; }
+
         public object this[Column column]
         {
             get
@@ -59,10 +63,6 @@ namespace TestFSQ
                     }
             }
         }
-
-        public double Frequency { get; set; }
-
-        public double Amplitude { get; set; }
 
         public static NumericColumn Column_Amplitude { get; } = new NumericColumn("Amplitude", "dB");
 
