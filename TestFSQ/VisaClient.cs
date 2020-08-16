@@ -217,6 +217,9 @@ namespace TestFSQ
         public override string ToString() => ResourceName + " | " + VendorName + " | " + Model + " | " + SerialNumber + " | " + DeviceVersion;
 
         public bool Equals(VisaClient other) => ResourceName == other.ResourceName;
+        public static bool operator !=(VisaClient s1, VisaClient s2) => !s1.Equals(s2);
+        public static bool operator ==(VisaClient s1, VisaClient s2) => s1.Equals(s2);
+        public override bool Equals(object other) => other is VisaClient sp && Equals(sp);
 
         public override int GetHashCode() => ResourceName.GetHashCode();
     }
