@@ -15,19 +15,40 @@ namespace TestFSQ
         public SpectrumChart(string name, SpectrumTable st) : base(name)
         {
             SpectrumTable = st;
+            SpectrumTable.Status = TableStatus.Downloading;
             SpectrumTable.DataViews.Add(this);
 
-            AddArea(MainArea = new Area(this, "Main", 0.3f) { HasXAxisBar = true, });
+            AddArea(MainArea = new OscillatorArea(this, "Main", 0.3f) { 
+                HasXAxisBar = true,
+                Reference = -50,
+                UpperLimit = -10,
+                LowerLimit = -100,
+                UpperColor = Color.Green,
+                LowerColor = Color.Red,
+                FixedTickStep_Right = 10,
+
+            });
             MainArea.AddSeries(MainSeries = new LineSeries(SpectrumPoint.Column_Amplitude));
         }
 
+        public override int RightBlankAreaWidth => 0;
+
         public SpectrumTable SpectrumTable { get; private set; }
 
-        public Area MainArea { get; }
+        public OscillatorArea MainArea { get; }
 
         public LineSeries MainSeries { get; }
 
-        public override string this[int i] => SpectrumTable[i].Frequency.ToString();
+        public override string this[int i]
+        {
+            get
+            {
+                if (SpectrumTable[i] is SpectrumPoint sp && sp.Frequency is double d)
+                    return d.ToString();
+                else
+                    return string.Empty;
+            }
+        }
 
         public override ITable Table
         {
@@ -42,12 +63,25 @@ namespace TestFSQ
             }
         }
 
+        public override void PointerToEnd()
+        {
+            if (Table is ITable t)
+            {
+                StartPt = 0;
+                IndexCount = Table.Count; //- 1;
+                StopPt = t.Count;
+            }
+            else
+            {
+                StopPt = 0;
+            }
+
+            SetAsyncUpdateUI(); // async update
+        }
+
         public override void CoordinateOverlay()
         {
             ResumeLayout(true);
-
-         
-
             ChartBounds = new Rectangle(
                 LeftYAxisLabelWidth + Margin.Left,
                 Margin.Top,
@@ -60,9 +94,6 @@ namespace TestFSQ
                 lock (SpectrumTable.DataLockObject)
                     lock (GraphicsLockObject)
                     {
-                        StartPt = 0;
-                        IndexCount = Table.Count - 1;
-
                         AxisX.TickList.Clear();
 
                         int tickMulti = 1;

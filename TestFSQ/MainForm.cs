@@ -36,17 +36,26 @@ namespace TestFSQ
             SpecAnUpdateTask.Start();
         }
 
-        FSQ Fsq { get; set; }
+        const string SpecAnAddress = "TCPIP0::192.168.18.31::inst0::INSTR";
+
+        SpecAn SpecAn { get; set; }
 
         Task SpecAnUpdateTask { get; set; }
 
         CancellationTokenSource CancelSpecAnUpdate { get; } = new CancellationTokenSource();
 
-        private void SpecAnUpdateWorker() 
+        private void SpecAnUpdateWorker()
         {
+            if (SpecAn is null)
+            {
+                SpecAn = new SpecAn(SpecAnAddress);
+                Console.WriteLine(SpecAn.ToString());
+                SpecAn.SelectScreen(FSQScreen.A);
+            }
+
             while (!CancelSpecAnUpdate.IsCancellationRequested) 
             {
-                Fsq.GetTraceData(Program.SpectrumTable, 1);
+                SpecAn.GetTraceData(Program.SpectrumTable, 1);
                 Thread.Sleep(200);
                 // Add wait OPC? here/
             }
@@ -55,18 +64,21 @@ namespace TestFSQ
 
         private void BtnAutoFindFSQ_Click(object sender, EventArgs e)
         {
-            Fsq = new FSQ("TCPIP0::192.168.18.31::inst0::INSTR");
-            Console.WriteLine(Fsq.ToString());
+            if (SpecAn is null)
+            {
+                SpecAn = new SpecAn(SpecAnAddress);
+                Console.WriteLine(SpecAn.ToString());
+                SpecAn.SelectScreen(FSQScreen.A);
+            }
 
-
-            Fsq.SelectScreen(FSQScreen.A);
-            Console.WriteLine("Center = " + Fsq.SetCenterFreq(3602236584.2145587487));
-            Console.WriteLine("Span = " + Fsq.SetSpanFreq(43256489.85445522266));
+          
+            Console.WriteLine("Center = " + SpecAn.SetCenterFreq(3602236584.2145587487));
+            Console.WriteLine("Span = " + SpecAn.SetSpanFreq(43256489.85445522266));
 
             Thread.Sleep(500);
 
 
-            Fsq.GetTraceData(Program.SpectrumTable, 1);
+            SpecAn.GetTraceData(Program.SpectrumTable, 1);
             /*
             Fsq.GetTraceData();
             Fsq.GetTraceData();

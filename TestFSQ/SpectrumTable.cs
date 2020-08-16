@@ -15,20 +15,22 @@ namespace TestFSQ
 
         public void Add(SpectrumPoint sp)
         {
-            if (Rows.Contains(sp))
-                Rows.Where(n => n.Equals(sp)).First().Amplitude = sp.Amplitude;
-            else
-                Rows.Add(sp);
+            lock (Rows)
+                if (Rows.Contains(sp))
+                    Rows.Where(n => n.Equals(sp)).First().Amplitude = sp.Amplitude;
+                else
+                    Rows.Add(sp);
         }
 
         public SpectrumPoint this[int i]
         {
             get
             {
-                if (i >= Count || i < 0)
-                    return null;
-                else
-                    return Rows.ElementAt(i);
+                lock (Rows)
+                    if (i >= Count || i < 0)
+                        return null;
+                    else
+                        return Rows.ElementAt(i);
             }
         }
 
@@ -36,10 +38,11 @@ namespace TestFSQ
         {
             get
             {
-                if (i >= Count || i < 0)
-                    return double.NaN;
-                else
-                    return Rows.ElementAt(i)[column];
+                lock (Rows)
+                    if (i >= Count || i < 0)
+                        return double.NaN;
+                    else
+                        return Rows.ElementAt(i)[column];
             }
         }
 
@@ -59,15 +62,11 @@ namespace TestFSQ
 
                 if (m_Status == TableStatus.CalculateFinished)
                 {
-                    lock (DataViews) DataViews.ForEach(n => { n.ReadyToShow = true; n.PointerToEnd(); });
-                }
-                else if (m_Status == TableStatus.TickingFinished)
-                {
-                    lock (DataViews) DataViews.ForEach(n => { n.ReadyToShow = true; n.PointerToNextTick(); });
+                    lock (DataViews) DataViews.ForEach(n => { n.ReadyToShow = true;  n.PointerToEnd(); });
                 }
                 else if (!ReadyToShow)
                 {
-                    lock (DataViews) DataViews.ForEach(n => { n.ReadyToShow = true; n.PointerToEnd(); n.SetAsyncUpdateUI(); });
+                    lock (DataViews) DataViews.ForEach(n => { n.ReadyToShow = false; n.SetAsyncUpdateUI(); });
                 }
             }
         }

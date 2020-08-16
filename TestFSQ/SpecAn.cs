@@ -20,9 +20,9 @@ namespace TestFSQ
         B,
     }
 
-    public class FSQ
+    public class SpecAn
     {
-        public FSQ()
+        public SpecAn()
         {
             var list = VisaClient.FindResources();
             foreach (string s in list)
@@ -43,7 +43,7 @@ namespace TestFSQ
             if (Client is null) MessageBox.Show("Unable to find FSQ");
         }
 
-        public FSQ(string resourceName)
+        public SpecAn(string resourceName)
         {
             Client = new VisaClient(resourceName);
             if (!Client.Model.Contains("FSQ")) throw new Exception("Not an FSQ!");
@@ -110,7 +110,7 @@ namespace TestFSQ
             var list = Client.Query("TRAC? TRACE" + num.ToString() + "\n").Split(',').Select(n => n.ToDouble()).ToList();
             double space = delta / (list.Count - 2);
 
-            st.Status = TableStatus.Downloading;
+            //st.Status = TableStatus.Downloading;
             lock (st.DataLockObject)
             {
                 st.Clear();
