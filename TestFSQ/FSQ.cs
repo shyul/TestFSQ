@@ -97,9 +97,37 @@ namespace TestFSQ
         public double GetOffsetFreq() => GetNumber("FREQ:OFFS?\n");
 
 
-        public void SelectTrace(int num) => Client.Write("DISP:WIND:TRAC2");
+        public void SelectTrace(int num) => Client.Write("DISP:WIND:TRAC" + num.ToString() + "\n");
 
         public IEnumerable<double> GetTraceData(int num = 1) => Client.Query("TRAC? TRACE" + num.ToString() + "\n").Split(',').Select(n => n.ToDouble());
+
+        public void GetTraceData(SpectrumTable st, int num = 1)
+        {
+            double freq = GetStartFreq();
+            double stopFreq = GetStopFreq();
+            double delta = Math.Abs(stopFreq - freq);
+
+            var list = Client.Query("TRAC? TRACE" + num.ToString() + "\n").Split(',').Select(n => n.ToDouble()).ToList();
+            double space = delta / (list.Count - 2);
+
+            st.Status = TableStatus.Downloading;
+            lock (st.DataLockObject)
+            {
+                st.Clear();
+                for (int i = 0; i < list.Count; i++)
+                {
+                    SpectrumPoint sp = new SpectrumPoint(freq, list[i]);
+                    st.Add(sp);
+
+                    //Console.WriteLine(i + ": " + sp.Frequency + " | " + sp.Amplitude);
+
+                    freq += space;
+                }
+
+
+            }
+            st.Status = TableStatus.CalculateFinished;
+        }
 
         public double GetNumber(string cmd) => double.Parse(Client.Query(cmd).Trim());
 
