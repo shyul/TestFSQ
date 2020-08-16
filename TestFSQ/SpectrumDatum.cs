@@ -9,9 +9,9 @@ using Xu.Chart;
 
 namespace TestFSQ
 {
-    public class SpectrumPoint : IRow, IEquatable<SpectrumPoint>
+    public class SpectrumDatum : IRow, IEquatable<SpectrumDatum>
     {
-        public SpectrumPoint(double freq, double amp)
+        public SpectrumDatum(double freq, double amp)
         {
             Frequency = freq;
             Amplitude = amp;
@@ -66,10 +66,10 @@ namespace TestFSQ
 
         public static NumericColumn Column_Amplitude { get; } = new NumericColumn("Amplitude", "dB");
 
-        public bool Equals(SpectrumPoint other) => Frequency == other.Frequency;
-        public static bool operator !=(SpectrumPoint s1, SpectrumPoint s2) => !s1.Equals(s2);
-        public static bool operator ==(SpectrumPoint s1, SpectrumPoint s2) => s1.Equals(s2);
-        public override bool Equals(object other) => other is SpectrumPoint sp && Equals(sp);
+        public bool Equals(SpectrumDatum other) => Frequency == other.Frequency;
+        public static bool operator !=(SpectrumDatum s1, SpectrumDatum s2) => !s1.Equals(s2);
+        public static bool operator ==(SpectrumDatum s1, SpectrumDatum s2) => s1.Equals(s2);
+        public override bool Equals(object other) => other is SpectrumDatum sp && Equals(sp);
 
         public override int GetHashCode() => Frequency.GetHashCode();
     }

@@ -21,14 +21,14 @@ namespace TestFSQ
             AddArea(MainArea = new OscillatorArea(this, "Main", 0.3f) { 
                 HasXAxisBar = true,
                 Reference = -50,
-                UpperLimit = -10,
-                LowerLimit = -100,
+                UpperLimit = -20,
+                LowerLimit = -80,
                 UpperColor = Color.Green,
                 LowerColor = Color.Red,
                 FixedTickStep_Right = 10,
 
             });
-            MainArea.AddSeries(MainSeries = new LineSeries(SpectrumPoint.Column_Amplitude));
+            MainArea.AddSeries(MainSeries = new LineSeries(SpectrumDatum.Column_Amplitude));
         }
 
         public override int RightBlankAreaWidth => 0;
@@ -43,7 +43,7 @@ namespace TestFSQ
         {
             get
             {
-                if (SpectrumTable[i] is SpectrumPoint sp && sp.Frequency is double d)
+                if (SpectrumTable[i] is SpectrumDatum sp && sp.Frequency is double d)
                     return d.ToString();
                 else
                     return string.Empty;

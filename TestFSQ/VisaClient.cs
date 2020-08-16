@@ -9,7 +9,7 @@ using Xu;
 
 namespace TestFSQ
 {
-    public class VisaClient : IDisposable, IEquatable<VisaClient>
+    public abstract class VisaClient : IDisposable, IEquatable<VisaClient>
     {
         public VisaClient(string resourceName) => Open(resourceName);
 
@@ -27,7 +27,7 @@ namespace TestFSQ
 
         public string Version { get; private set; } = "Unknown";
 
-        private void Open(string resourceName)
+        protected void Open(string resourceName)
         {
             try
             {
@@ -200,11 +200,13 @@ namespace TestFSQ
             }
         }
 
-        public void Reset()
-        {
-            // *RST\n
-            Write("*RST\n");
-        }
+        public double GetNumber(string cmd) => double.Parse(Query(cmd).Trim());
+
+        public void SyncWait() => Write("INIT;*WAI\n");
+
+        public bool IsReady => Query("*OPC?\n").Trim() == "1";
+
+        public void Reset() => Write("*RST\n");
 
         public static string[] FindResources() => ResourceManager.GetLocalManager().FindResources("?*");
 

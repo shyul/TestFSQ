@@ -11,9 +11,9 @@ namespace TestFSQ
 {
     public class SpectrumTable : ITable
     {
-        private HashSet<SpectrumPoint> Rows { get; } = new HashSet<SpectrumPoint>();
+        private HashSet<SpectrumDatum> Rows { get; } = new HashSet<SpectrumDatum>();
 
-        public void Add(SpectrumPoint sp)
+        public void Add(SpectrumDatum sp)
         {
             lock (Rows)
                 if (Rows.Contains(sp))
@@ -22,7 +22,7 @@ namespace TestFSQ
                     Rows.Add(sp);
         }
 
-        public SpectrumPoint this[int i]
+        public SpectrumDatum this[int i]
         {
             get
             {
@@ -39,7 +39,7 @@ namespace TestFSQ
             get
             {
                 lock (Rows)
-                    if (i >= Count || i < 0)
+                    if (i >= Count || i < 0 || Count == 0)
                         return double.NaN;
                     else
                         return Rows.ElementAt(i)[column];
@@ -48,7 +48,11 @@ namespace TestFSQ
 
         public int Count => Rows.Count;
 
-        public void Clear() => Rows.Clear();
+        public void Clear()
+        {
+            lock (Rows)
+                Rows.Clear();
+        }
 
         public bool ReadyToShow => Count > 0 && Status != TableStatus.Default && Status != TableStatus.Loading && Status != TableStatus.Downloading && Status != TableStatus.Maintaining;// (Status == TableStatus.Ready || Status == TableStatus.CalculateFinished || Status == TableStatus.TickingFinished);
 

@@ -20,8 +20,9 @@ namespace TestFSQ
         B,
     }
 
-    public class SpecAn
+    public class SpecAn : VisaClient
     {
+        /*
         public SpecAn()
         {
             var list = VisaClient.FindResources();
@@ -41,19 +42,18 @@ namespace TestFSQ
             }
 
             if (Client is null) MessageBox.Show("Unable to find FSQ");
-        }
+        }*/
 
-        public SpecAn(string resourceName)
+        public SpecAn(string resourceName) : base(resourceName)
         {
-            Client = new VisaClient(resourceName);
-            if (!Client.Model.Contains("FSQ")) throw new Exception("Not an FSQ!");
+            if (!Model.Contains("FSQ")) throw new Exception("Not an FSQ!");
         }
 
         public void SelectMode(FSQMode mode)
         {
             switch (mode)
             {
-                case FSQMode.SpectrumAnalyzer: Client.Write("INST:SEL SAN\n"); break;
+                case FSQMode.SpectrumAnalyzer: Write("INST:SEL SAN\n"); break;
                 default: break;
             }
         }
@@ -62,8 +62,8 @@ namespace TestFSQ
         {
             switch (sc)
             {
-                case FSQScreen.A: Client.Write("DISP:WIND1:SEL\n"); break;
-                case FSQScreen.B: Client.Write("DISP:WIND2:SEL\n"); break;
+                case FSQScreen.A: Write("DISP:WIND1:SEL\n"); break;
+                case FSQScreen.B: Write("DISP:WIND2:SEL\n"); break;
                 default: break;
             }
         }
@@ -72,8 +72,8 @@ namespace TestFSQ
 
         public string SetCenterFreq(string freq)
         {
-            Client.Write("FREQ:CENT " + freq + "\n");
-            return Client.Query("FREQ:CENT?\n").Trim();
+            Write("FREQ:CENT " + freq + "\n");
+            return Query("FREQ:CENT?\n").Trim();
         }
 
         public double SetSpanFreq(double freq) 
@@ -82,32 +82,35 @@ namespace TestFSQ
             return GetSpanFreq();
         }
 
-        public void SetFullSpan() => Client.Write("FREQ:SPAN:FULL");
-        public void SetZeroSpan() => Client.Write("FREQ:SPAN 0Hz");
-        public void SetSpanFreq(string freq) => Client.Write("FREQ:SPAN " + freq + "\n");
+        public void SetFullSpan() => Write("FREQ:SPAN:FULL");
+        public void SetZeroSpan() => Write("FREQ:SPAN 0Hz");
+        public void SetSpanFreq(string freq) => Write("FREQ:SPAN " + freq + "\n");
         public double GetSpanFreq() => GetNumber("FREQ:SPAN?\n");
 
-        public void SetStartFreq(string freq) => Client.Write("FREQ:STAR " + freq + "\n");
+        public void SetStartFreq(string freq) => Write("FREQ:STAR " + freq + "\n");
         public double GetStartFreq() => GetNumber("FREQ:STAR?\n");
 
-        public void SetStopFreq(string freq) => Client.Write("FREQ:STOP " + freq + "\n");
+        public void SetStopFreq(string freq) => Write("FREQ:STOP " + freq + "\n");
         public double GetStopFreq() => GetNumber("FREQ:STOP?\n");
 
-        public void SetOffsetFreq(string freq) => Client.Write("FREQ:OFFS " + freq + "\n");
+        public void SetOffsetFreq(string freq) => Write("FREQ:OFFS " + freq + "\n");
         public double GetOffsetFreq() => GetNumber("FREQ:OFFS?\n");
 
 
-        public void SelectTrace(int num) => Client.Write("DISP:WIND:TRAC" + num.ToString() + "\n");
+        public void SelectTrace(int num) => Write("DISP:WIND:TRAC" + num.ToString() + "\n");
 
-        public IEnumerable<double> GetTraceData(int num = 1) => Client.Query("TRAC? TRACE" + num.ToString() + "\n").Split(',').Select(n => n.ToDouble());
+        public IEnumerable<double> GetTraceData(int num = 1) => Query("TRAC? TRACE" + num.ToString() + "\n").Split(',').Select(n => n.ToDouble());
 
         public void GetTraceData(SpectrumTable st, int num = 1)
         {
+            //SyncWait();
+            while (!IsReady) { }
+
             double freq = GetStartFreq();
             double stopFreq = GetStopFreq();
             double delta = Math.Abs(stopFreq - freq);
 
-            var list = Client.Query("TRAC? TRACE" + num.ToString() + "\n").Split(',').Select(n => n.ToDouble()).ToList();
+            var list = GetTraceData(num).ToList();
             double space = delta / (list.Count - 2);
 
             //st.Status = TableStatus.Downloading;
@@ -116,7 +119,7 @@ namespace TestFSQ
                 st.Clear();
                 for (int i = 0; i < list.Count; i++)
                 {
-                    SpectrumPoint sp = new SpectrumPoint(freq, list[i]);
+                    SpectrumDatum sp = new SpectrumDatum(freq, list[i]);
                     st.Add(sp);
 
                     //Console.WriteLine(i + ": " + sp.Frequency + " | " + sp.Amplitude);
@@ -129,9 +132,16 @@ namespace TestFSQ
             st.Status = TableStatus.CalculateFinished;
         }
 
-        public double GetNumber(string cmd) => double.Parse(Client.Query(cmd).Trim());
-
-        public VisaClient Client { get; }
-        public override string ToString() => Client.ToString();
+        public bool IsRefreshing
+        {
+            get => Query("INIT:CONT?\n").Trim() == "1";
+            set
+            {
+                if (value)
+                    Write("INIT:CONT ON");
+                else
+                    Write("INIT:CONT OFF");
+            }
+        }
     }
 }

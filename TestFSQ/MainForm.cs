@@ -16,6 +16,7 @@ namespace TestFSQ
         public MainForm()
         {
             InitializeComponent();
+            InitSpecAn();
         }
 
         private void BtnTestFindResources_Click(object sender, EventArgs e)
@@ -29,22 +30,19 @@ namespace TestFSQ
 
         private void BtnTestFSQ_Click(object sender, EventArgs e)
         {
-
-            //Console.WriteLine(Fsq.Client.Query("FREQ:CENT?\n"));
-
-            SpecAnUpdateTask = new Task(() => { SpecAnUpdateWorker(); });
-            SpecAnUpdateTask.Start();
+            SpecAnRefreshTask = new Task(() => { SpecAnRefreshWorker(); });
+            SpecAnRefreshTask.Start();
         }
 
         const string SpecAnAddress = "TCPIP0::192.168.18.31::inst0::INSTR";
 
-        SpecAn SpecAn { get; set; }
+        private SpecAn SpecAn { get; set; }
 
-        Task SpecAnUpdateTask { get; set; }
+        private Task SpecAnRefreshTask { get; set; }
 
-        CancellationTokenSource CancelSpecAnUpdate { get; } = new CancellationTokenSource();
+        private CancellationTokenSource CancelSpecAnRefresh { get; } = new CancellationTokenSource();
 
-        private void SpecAnUpdateWorker()
+        private void InitSpecAn() 
         {
             if (SpecAn is null)
             {
@@ -52,54 +50,31 @@ namespace TestFSQ
                 Console.WriteLine(SpecAn.ToString());
                 SpecAn.SelectScreen(FSQScreen.A);
             }
+        }
 
-            while (!CancelSpecAnUpdate.IsCancellationRequested) 
+        private void SpecAnRefreshWorker()
+        {
+            if (!SpecAn.IsRefreshing) SpecAn.IsRefreshing = true;
+            while (!CancelSpecAnRefresh.IsCancellationRequested)
             {
+                Thread.Sleep(10);
                 SpecAn.GetTraceData(Program.SpectrumTable, 1);
-                Thread.Sleep(200);
-                // Add wait OPC? here/
             }
-        
         }
 
         private void BtnAutoFindFSQ_Click(object sender, EventArgs e)
         {
-            if (SpecAn is null)
-            {
-                SpecAn = new SpecAn(SpecAnAddress);
-                Console.WriteLine(SpecAn.ToString());
-                SpecAn.SelectScreen(FSQScreen.A);
-            }
+            if (SpecAn.IsRefreshing) SpecAn.IsRefreshing = false;
 
-          
-            Console.WriteLine("Center = " + SpecAn.SetCenterFreq(3602236584.2145587487));
-            Console.WriteLine("Span = " + SpecAn.SetSpanFreq(43256489.85445522266));
-
-            Thread.Sleep(500);
-
+            //Console.WriteLine("Center = " + SpecAn.SetCenterFreq(2802236583.2145587487));
+            //Console.WriteLine("Span = " + SpecAn.SetSpanFreq(63256489.85225522266));
+            SpecAn.SetCenterFreq(2802236583.2145587487);
+            SpecAn.SetSpanFreq(63256489.85225522266);
+            Thread.Sleep(100);
 
             SpecAn.GetTraceData(Program.SpectrumTable, 1);
-            /*
-            Fsq.GetTraceData();
-            Fsq.GetTraceData();
 
-            double freq = Fsq.GetStartFreq();
-            double stopFreq = Fsq.GetStopFreq();
-            double delta = Math.Abs(stopFreq - freq);
-        
-            var list = Fsq.GetTraceData().ToList();
-            double space = delta / (list.Count - 1);
-
-            List<(double freq, double value)> result = new List<(double freq, double value)>();
-            for(int i = 0; i < list.Count; i++) 
-            {
-                result.Add((freq, list[i]));
-                freq += space;
-            }
-
-
-            result.ForEach(n => Console.WriteLine(n.freq + " | " + n.value));*/
-
+            //result.ForEach(n => Console.WriteLine(n.freq + " | " + n.value));
         }
     }
 }
