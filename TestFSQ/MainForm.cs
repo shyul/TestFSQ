@@ -56,13 +56,13 @@ namespace TestFSQ
                 SpecAn.SelectMode(FSQMode.SpectrumAnalyzer);
                 SpecAn.SelectScreen(FSQScreen.A);
             }
-
+            */
             if (SigGen1 is null)
             {
                 SigGen1 = new SigGen(SigGen1Address);
                 Console.WriteLine(SigGen1.ToString());
 
-            }*/
+            }
 
             if (PowerSensor is null)
             {
@@ -148,6 +148,20 @@ namespace TestFSQ
         private void BtnCalibrateU200X_Click(object sender, EventArgs e)
         {
             PowerSensor.Calibrate();
+        }
+
+        private void BtnCalibrateSigGen1_Click(object sender, EventArgs e)
+        {
+            SigGen1.Power = 0;
+            SigGen1.RFOutputEnable = true;
+            for (double i = 20e6; i < 3e9; i += 20e6)
+            {
+                SigGen1.Frequency = PowerSensor.Frequency = i;
+                Thread.Sleep(100);
+                double power_out = PowerSensor.Power;
+
+                Console.WriteLine(power_out);
+            }
         }
     }
 }

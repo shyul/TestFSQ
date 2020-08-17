@@ -34,6 +34,7 @@
             this.BtnTestESGError = new System.Windows.Forms.Button();
             this.BtnTestU200X = new System.Windows.Forms.Button();
             this.BtnCalibrateU200X = new System.Windows.Forms.Button();
+            this.BtnCalibrateSigGen1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // BtnTestFindResources
@@ -96,11 +97,22 @@
             this.BtnCalibrateU200X.UseVisualStyleBackColor = true;
             this.BtnCalibrateU200X.Click += new System.EventHandler(this.BtnCalibrateU200X_Click);
             // 
+            // BtnCalibrateSigGen1
+            // 
+            this.BtnCalibrateSigGen1.Location = new System.Drawing.Point(190, 91);
+            this.BtnCalibrateSigGen1.Name = "BtnCalibrateSigGen1";
+            this.BtnCalibrateSigGen1.Size = new System.Drawing.Size(116, 23);
+            this.BtnCalibrateSigGen1.TabIndex = 6;
+            this.BtnCalibrateSigGen1.Text = "Calibrate ESG";
+            this.BtnCalibrateSigGen1.UseVisualStyleBackColor = true;
+            this.BtnCalibrateSigGen1.Click += new System.EventHandler(this.BtnCalibrateSigGen1_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.BtnCalibrateSigGen1);
             this.Controls.Add(this.BtnCalibrateU200X);
             this.Controls.Add(this.BtnTestU200X);
             this.Controls.Add(this.BtnTestESGError);
@@ -121,6 +133,7 @@
         private System.Windows.Forms.Button BtnTestESGError;
         private System.Windows.Forms.Button BtnTestU200X;
         private System.Windows.Forms.Button BtnCalibrateU200X;
+        private System.Windows.Forms.Button BtnCalibrateSigGen1;
     }
 }
 
