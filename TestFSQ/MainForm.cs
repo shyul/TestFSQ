@@ -25,6 +25,8 @@ namespace TestFSQ
             InitInstruments();
         }
 
+        
+
         private void BtnTestFindResources_Click(object sender, EventArgs e)
         {
             var list = ViClient.FindResources();
@@ -48,7 +50,6 @@ namespace TestFSQ
 
         private void InitInstruments()
         {
-            /*
             if (SpecAn is null)
             {
                 SpecAn = new SpecAn(SpecAnAddress);
@@ -56,22 +57,22 @@ namespace TestFSQ
                 SpecAn.SelectMode(FSQMode.SpectrumAnalyzer);
                 SpecAn.SelectScreen(FSQScreen.A);
             }
-            */
+            
             if (SigGen1 is null)
             {
                 SigGen1 = new SigGen(SigGen1Address);
                 Console.WriteLine(SigGen1.ToString());
 
             }
-
+            /*
             if (PowerSensor is null)
             {
                 PowerSensor = new PowerSensor(PowerSensorAddress);
                 Console.WriteLine(PowerSensor.ToString());
-            }
+            }*/
         }
 
-        private void SetTestLink(double freq, double power) 
+        private void ConfigTest(double freq, double power) 
         {
             SpecAn.CenterFrequency = SigGen1.Frequency = freq;
             SpecAn.InputAttenuation = 20;
@@ -87,6 +88,17 @@ namespace TestFSQ
             Console.WriteLine("freq error = " + delta);
             Console.WriteLine("power error = " + actual_power);
         }
+        /*
+        private async Task SpecAnRefresh() 
+        {
+            await ......
+            if (!SpecAn.IsRefreshing) SpecAn.IsRefreshing = true;
+            while (!CancelSpecAnRefresh.IsCancellationRequested)
+            {
+                Thread.Sleep(10);
+                SpecAn.GetTraceData(Program.SpectrumTable, 1);
+            }
+        }*/
 
         private void SpecAnRefreshWorker()
         {
@@ -100,8 +112,12 @@ namespace TestFSQ
 
         private void BtnTestFSQ_Click(object sender, EventArgs e)
         {
-            SetTestLink(2702236583.2145587487, 10);
-            SpecAnRefreshTask = new Task(() => { SpecAnRefreshWorker(); });
+            ConfigTest(2702236583.2145587487, 10);
+
+            // Looping Task, no await use here!!
+            //Task.Run(SpecAnRefreshWorker);
+
+            SpecAnRefreshTask = new Task(SpecAnRefreshWorker);
             SpecAnRefreshTask.Start();
         }
 

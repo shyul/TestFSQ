@@ -18,7 +18,8 @@ namespace TestFSQ
             SpectrumTable.Status = TableStatus.Downloading;
             SpectrumTable.DataViews.Add(this);
 
-            AddArea(MainArea = new OscillatorArea(this, "Main", 0.3f) { 
+            AddArea(MainArea = new OscillatorArea(this, "Main", 0.3f) 
+            { 
                 HasXAxisBar = true,
                 Reference = -50,
                 UpperLimit = -20,
@@ -28,7 +29,12 @@ namespace TestFSQ
                 FixedTickStep_Right = 10,
 
             });
-            MainArea.AddSeries(MainSeries = new LineSeries(SpectrumDatum.Column_Amplitude) { Color = Color.Gray });
+            MainArea.AddSeries(MainSeries = new LineSeries(SpectrumDatum.Column_Amplitude) 
+            { 
+                Color = Color.Gray,
+                IsAntialiasing = true,
+                Tension = 0
+            });
         }
 
         public override int RightBlankAreaWidth => 0;

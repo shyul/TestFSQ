@@ -247,7 +247,7 @@ namespace TestFSQ
 
         public void SyncWait() => Write("INIT;*WAI\n");
 
-        public bool IsReady => Query("*OPC?\n").Trim() == "1";
+        public bool IsReady => Session is MessageBasedSession && Query("*OPC?\n") is string s && s.Trim() == "1";
 
         public bool SelfTest => Query("*TST?\n").Trim() == "1";
 

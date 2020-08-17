@@ -13,6 +13,9 @@
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
+            //if (SpecAn is SpecAn sa) sa.Dispose();
+            if (SigGen1 is SigGen sg) sg.Dispose();
+
             if (disposing && (components != null))
             {
                 components.Dispose();
