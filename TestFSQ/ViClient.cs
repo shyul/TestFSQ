@@ -33,7 +33,7 @@ namespace TestFSQ
             {
                 ResourceName = resourceName;
                 Session = ResourceManager.GetLocalManager().Open(ResourceName) as MessageBasedSession;
-                Reset();
+                
                 string[] result = Query("*IDN?\n").Split(',');
                 if (result.Length > 3)
                 {
@@ -51,7 +51,7 @@ namespace TestFSQ
             catch (Exception exp)
             {
                 Session = null;
-                Console.WriteLine(exp.Message);
+                Console.WriteLine("Opening: " + resourceName + " | " + exp.Message);
             }
             finally
             {
@@ -239,13 +239,17 @@ namespace TestFSQ
 
         public double GetNumber(string cmd) => double.Parse(Query(cmd).Trim());
 
-        private ViException GetError() => new ViException(QueryNoErrorCheck("SYST:ERR?\n").Trim());
+        public ViException GetError() => new ViException(QueryNoErrorCheck("SYST:ERR?\n"));
+
+        public void Reset() => Write("*RST\n");
+
+        public void Trigger() => Write("*TRG\n");
 
         public void SyncWait() => Write("INIT;*WAI\n");
 
         public bool IsReady => Query("*OPC?\n").Trim() == "1";
 
-        public void Reset() => Write("*RST\n");
+        public bool SelfTest => Query("*TST?\n").Trim() == "1";
 
         public static string[] FindResources() => ResourceManager.GetLocalManager().FindResources("?*");
 
@@ -265,12 +269,15 @@ namespace TestFSQ
     {
         public ViException(string returnMessage)
         {
-            var fields = returnMessage.CsvReadFields();
-
-            if (fields.Length > 1)
+            if (returnMessage is string s)
             {
-                Code = fields[0].ToInt32(-1);
-                Message = fields[1].Trim().Trim('"').Trim();
+                var fields = s.Trim().CsvReadFields();
+
+                if (fields.Length > 1)
+                {
+                    Code = fields[0].ToInt32(-1);
+                    Message = fields[1].Trim().Trim('"').Trim();
+                }
             }
         }
 

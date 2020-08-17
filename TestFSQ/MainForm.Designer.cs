@@ -32,6 +32,8 @@
             this.BtnTestFSQ = new System.Windows.Forms.Button();
             this.BtnAutoFindFSQ = new System.Windows.Forms.Button();
             this.BtnTestESGError = new System.Windows.Forms.Button();
+            this.BtnTestU200X = new System.Windows.Forms.Button();
+            this.BtnCalibrateU200X = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // BtnTestFindResources
@@ -74,11 +76,33 @@
             this.BtnTestESGError.UseVisualStyleBackColor = true;
             this.BtnTestESGError.Click += new System.EventHandler(this.BtnTestESGError_Click);
             // 
+            // BtnTestU200X
+            // 
+            this.BtnTestU200X.Location = new System.Drawing.Point(345, 48);
+            this.BtnTestU200X.Name = "BtnTestU200X";
+            this.BtnTestU200X.Size = new System.Drawing.Size(116, 23);
+            this.BtnTestU200X.TabIndex = 4;
+            this.BtnTestU200X.Text = "Test U200X";
+            this.BtnTestU200X.UseVisualStyleBackColor = true;
+            this.BtnTestU200X.Click += new System.EventHandler(this.BtnTestU200X_Click);
+            // 
+            // BtnCalibrateU200X
+            // 
+            this.BtnCalibrateU200X.Location = new System.Drawing.Point(491, 48);
+            this.BtnCalibrateU200X.Name = "BtnCalibrateU200X";
+            this.BtnCalibrateU200X.Size = new System.Drawing.Size(116, 23);
+            this.BtnCalibrateU200X.TabIndex = 5;
+            this.BtnCalibrateU200X.Text = "Calibrate U200X";
+            this.BtnCalibrateU200X.UseVisualStyleBackColor = true;
+            this.BtnCalibrateU200X.Click += new System.EventHandler(this.BtnCalibrateU200X_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.BtnCalibrateU200X);
+            this.Controls.Add(this.BtnTestU200X);
             this.Controls.Add(this.BtnTestESGError);
             this.Controls.Add(this.BtnAutoFindFSQ);
             this.Controls.Add(this.BtnTestFSQ);
@@ -95,6 +119,8 @@
         private System.Windows.Forms.Button BtnTestFSQ;
         private System.Windows.Forms.Button BtnAutoFindFSQ;
         private System.Windows.Forms.Button BtnTestESGError;
+        private System.Windows.Forms.Button BtnTestU200X;
+        private System.Windows.Forms.Button BtnCalibrateU200X;
     }
 }
 

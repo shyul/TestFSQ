@@ -14,6 +14,11 @@ namespace TestFSQ
 {
     public partial class MainForm : Form
     {
+        const string SpecAnAddress = "TCPIP0::192.168.18.31::inst0::INSTR";
+        const string SigGen1Address = "GPIB0::25::INSTR";
+        const string SigGen2Address = "TCPIP0::192.168.18.34::inst0::INSTR";
+        const string PowerSensorAddress = "USB0::0x2A8D::0x2C18::MY57090007::INSTR";
+
         public MainForm()
         {
             InitializeComponent();
@@ -29,16 +34,13 @@ namespace TestFSQ
             }
         }
 
-
-
-        const string SpecAnAddress = "TCPIP0::192.168.18.31::inst0::INSTR";
-        const string SigGen1Address = "GPIB0::25::INSTR";
-        const string SigGen2Address = "TCPIP0::192.168.18.34::inst0::INSTR";
-        const string PowerSensorAddress = "GPIB0::25::INSTR";
-
         private SpecAn SpecAn { get; set; }
 
         private SigGen SigGen1 { get; set; }
+
+        private SigGen SigGen2 { get; set; }
+
+        private PowerSensor PowerSensor { get; set; }
 
         private Task SpecAnRefreshTask { get; set; }
 
@@ -46,6 +48,7 @@ namespace TestFSQ
 
         private void InitInstruments()
         {
+            /*
             if (SpecAn is null)
             {
                 SpecAn = new SpecAn(SpecAnAddress);
@@ -58,6 +61,13 @@ namespace TestFSQ
             {
                 SigGen1 = new SigGen(SigGen1Address);
                 Console.WriteLine(SigGen1.ToString());
+
+            }*/
+
+            if (PowerSensor is null)
+            {
+                PowerSensor = new PowerSensor(PowerSensorAddress);
+                Console.WriteLine(PowerSensor.ToString());
             }
         }
 
@@ -120,6 +130,24 @@ namespace TestFSQ
 
             //ViException error = SigGen1.GetError();
             //Console.WriteLine(error.Code + " || " + error.Message);
+        }
+
+        private void BtnTestU200X_Click(object sender, EventArgs e)
+        {
+            double res = 0;
+            for(int i = 0; i < 32; i++) 
+            {
+                res += PowerSensor.Power;
+            }
+            res /= 32;
+
+            Console.WriteLine(PowerSensor.Frequency);
+            Console.WriteLine(res);
+        }
+
+        private void BtnCalibrateU200X_Click(object sender, EventArgs e)
+        {
+            PowerSensor.Calibrate();
         }
     }
 }

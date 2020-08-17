@@ -46,6 +46,7 @@ namespace TestFSQ
 
         public SpecAn(string resourceName) : base(resourceName)
         {
+            Reset();
             if (!Model.Contains("FSQ")) throw new Exception("Not an FSQ!");
         }
 

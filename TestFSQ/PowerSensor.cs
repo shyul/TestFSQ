@@ -13,7 +13,10 @@ namespace TestFSQ
     {
         public PowerSensor(string resourceName) : base(resourceName)
         {
-            Calibrate();
+            Reset();
+            Write("*CLS\n");
+            IsRefreshing = true;
+            //Calibrate();
         }
 
         public double Frequency
@@ -36,6 +39,28 @@ namespace TestFSQ
             }
         }
 
-        public void Calibrate() => Write("CAL:ALL");
+        public bool IsRefreshing 
+        {
+            get => Query("INIT:CONT?\n").Trim() == "1";
+            set
+            {
+                if (value)
+                    Write("INIT:CONT ON");
+                else
+                    Write("INIT:CONT OFF");
+            }
+        }
+
+        public void Calibrate()
+        {
+            //while (!IsReady) { Thread.Sleep(50); }
+            Write("CAL:ALL");
+            Thread.Sleep(25000);
+            if (GetError() is ViException error && error.Code != 0)
+            {
+                Console.WriteLine(error.Code + " || " + error.Message);
+                throw error;
+            }
+        }
     }
 }

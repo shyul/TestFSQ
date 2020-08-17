@@ -10,6 +10,7 @@ namespace TestFSQ
     {
         public SigGen(string resourceName) : base(resourceName)
         {
+            Reset();
             RFOutputEnable = false;
             ModulationEnable = false;
         }
