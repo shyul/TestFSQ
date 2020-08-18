@@ -29,6 +29,7 @@ namespace TestFSQ
                 FixedTickStep_Right = 10,
 
             });
+
             MainArea.AddSeries(MainSeries = new LineSeries(SpectrumDatum.Column_Amplitude) 
             { 
                 Color = Color.Gray,

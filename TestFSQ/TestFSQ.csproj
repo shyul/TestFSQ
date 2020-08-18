@@ -55,6 +55,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CalibrationDatum.cs" />
     <Compile Include="ChartForm.cs" />
     <Compile Include="PowerSensor.cs" />
     <Compile Include="SigGen.cs" />
